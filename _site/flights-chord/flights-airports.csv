@@ -1,0 +1,32 @@
+index,ORIGIN,airport_full_name,airport_city,group,color,size,name
+0,ATL,Hartsfield Jackson Atlanta International Airport,Atlanta,1,#FF7F00,568,Atlanta
+17,MCO,Orlando International Airport,Orlando,1,#FF7F00,343,Orlando
+13,JFK,John F Kennedy International Airport,New York,1,#FF7F00,255,New York
+10,FLL,Fort Lauderdale Hollywood International Airport,Fort Lauderdale,1,#FF7F00,248,Fort Lauderdale
+3,CLT,Charlotte Douglas International Airport,Charlotte,1,#FF7F00,236,Charlotte
+1,BOS,General Edward Lawrence Logan International Airport,Boston,1,#FF7F00,212,Boston
+2,BWI,Baltimore/Washington International Thurgood Marshall Airport,Baltimore,1,#FF7F00,196,Baltimore
+19,MIA,Miami International Airport,Miami,1,#FF7F00,196,Miami
+9,EWR,Newark Liberty International Airport,Newark,1,#FF7F00,191,Newark
+16,LGA,La Guardia Airport,New York,1,#FF7F00,168,New York
+30,TPA,Tampa International Airport,Tampa,1,#FF7F00,165,Tampa
+8,DTW,Detroit Metropolitan Wayne County Airport,Detroit,1,#FF7F00,156,Detroit
+24,PHL,Philadelphia International Airport,Philadelphia,1,#FF7F00,149,Philadelphia
+5,DCA,Ronald Reagan Washington National Airport,Washington,1,#FF7F00,124,Washington
+7,DFW,Dallas Fort Worth International Airport,Dallas-Fort Worth,2,#377EB8,333,Dallas-Fort Worth
+21,ORD,Chicago O'Hare International Airport,Chicago,2,#377EB8,308,Chicago
+18,MDW,Chicago Midway International Airport,Chicago,2,#377EB8,176,Chicago
+20,MSP,Minneapolis-St Paul International/Wold-Chamberlain Airport,Minneapolis,2,#377EB8,170,Minneapolis
+12,IAH,George Bush Intercontinental Houston Airport,Houston,2,#377EB8,166,Houston
+4,DAL,Dallas Love Field,Dallas,2,#377EB8,135,Dallas
+6,DEN,Denver International Airport,Denver,3,#F781BF,375,Denver
+29,SLC,Salt Lake City International Airport,Salt Lake City,3,#F781BF,136,Salt Lake City
+15,LAX,Los Angeles International Airport,Los Angeles,4,#A0522D,413,Los Angeles
+25,PHX,Phoenix Sky Harbor International Airport,Phoenix,4,#A0522D,359,Phoenix
+14,LAS,McCarran International Airport,Las Vegas,4,#A0522D,345,Las Vegas
+28,SFO,San Francisco International Airport,San Francisco,4,#A0522D,272,San Francisco
+27,SEA,Seattle Tacoma International Airport,Seattle,4,#A0522D,264,Seattle
+26,SAN,San Diego International Airport,San Diego,4,#A0522D,167,San Diego
+23,PDX,Portland International Airport,Portland,4,#A0522D,119,Portland
+11,HNL,Honolulu International Airport,Honolulu,5,#984EA3,130,Honolulu
+22,OTHER,Other Airports,Other Cities,6,#4DAF4A,2703,Other Cities

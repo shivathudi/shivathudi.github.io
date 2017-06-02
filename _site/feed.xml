@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-06-02T00:32:40-07:00</updated><id>http://localhost:4000/</id><title type="html">Shiva Thudi</title><subtitle>Hi! I’m Shiva Thudi, and this is my blog about the machine learning and data visualization projects I have done.
+</subtitle><entry><title type="html">Interactive visualizations using D3.js and D3 wrappers in Shiny</title><link href="http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights.html" rel="alternate" type="text/html" title="Interactive visualizations using D3.js and D3 wrappers in Shiny" /><published>2017-04-30T20:43:02-07:00</published><updated>2017-04-30T20:43:02-07:00</updated><id>http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights.html">&lt;p&gt;I think D3.js is the one of the best libraries out there for interactive visualizations. This post will cover two cases; the first one uses D3.js while the second one uses D3 wrappers in Shiny.&lt;/p&gt;
+
+&lt;h3 id=&quot;domestic-flights-by-city-in-the-us&quot;&gt;Domestic Flights by City in the US&lt;/h3&gt;
+
+&lt;p&gt;The interactive plot is located here – &lt;a href=&quot;https://shivathudi.github.io/flights-chord/&quot;&gt;Chord Diagram&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The mouseover interactions can only be seen at the link above. The following screenshots only show some examples of static content and do not do justice to the actual figure.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/chord1.png&quot; alt=&quot;Chord1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/chord2.png&quot; alt=&quot;Chord2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The code for the chord diagram and the flights data can be found &lt;a href=&quot;https://shivathudi.github.io/flights-chord/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;diabetes-visualizations-in-shiny-using-d3-wrappers&quot;&gt;Diabetes visualizations in Shiny using D3 wrappers&lt;/h3&gt;
+
+&lt;p&gt;Three different visualizations on a diabetes data set are located here – &lt;a href=&quot;https://shivathudi.shinyapps.io/diabetes-vis2/&quot;&gt;Diabetes Visualizations&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Again, to explore the full interactivity of these plots, I recommend that you visit the above link. The following examples are screenshots of static content.&lt;/p&gt;
+
+&lt;h3 id=&quot;parallel-co-ordinates-plot-with-brushing&quot;&gt;Parallel Co-ordinates Plot with Brushing&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/diab1.png&quot; alt=&quot;diab1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Here, you can select certain ranges of variables using brushing:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/diab1.png&quot; alt=&quot;diab2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Scatterplot Matrix colored by different factors&lt;/p&gt;
+
+&lt;p&gt;Here, there are three different factor variables that can be used to color the points – race, gender, and age.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/diab3.png&quot; alt=&quot;diab3&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can select certain points in one square using brushing, and the same points are selected in the other squares:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/diab4.png&quot; alt=&quot;diab4&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;heatmaps-with-different-groupings&quot;&gt;Heatmaps with different groupings&lt;/h3&gt;
+
+&lt;p&gt;For these heatmaps, a user can select groupings to visualize measures such as the time in the hospital, and the number of lab procedures performed on diabetes patients.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/diab5.png&quot; alt=&quot;diab5&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The user can mouse over a particular cell to see the average value for that particular column or measure across the row or grouping.&lt;/p&gt;
+
+&lt;p&gt;The code for all of the diabetes data visualizations can be found &lt;a href=&quot;https://github.com/shivathudi/data-visualization/tree/master/diabetes_data&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">I think D3.js is the one of the best libraries out there for interactive visualizations. This post will cover two cases; the first one uses D3.js while the second one uses D3 wrappers in Shiny.</summary></entry></feed>
