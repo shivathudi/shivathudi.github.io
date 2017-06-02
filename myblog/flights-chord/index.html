@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Domestic Flights by City</title>
+<style>
+
+@import url(style.css);
+
+#circle circle {
+  fill: none;
+  pointer-events: all;
+}
+
+.group path {
+  fill-opacity: .5;
+}
+
+path.chord {
+  stroke: #000;
+  stroke-width: .25px;
+}
+
+#circle:hover path.fade {
+  display: none;
+}
+
+/* Legend Font Style */
+body {
+  font: 12px sans-serif;
+}
+        
+/* Legend Position Style */
+.legend {
+  font: 11px sans-serif;
+  position:absolute;
+  left:-40px;
+  top:120px;
+}
+
+
+</style>
+
+<h1>Domestic Flights by City</h1>
+
+<aside>Mouseover to focus on flights to or from a single city. The top 30 airports are displayed, and the smaller airports and cities are grouped into the "Other Cities" category.
+
+<p>The cities are colored by their timezone: for example, Atlanta and Boston both fall under the Eastern Time Zone, while Los Angeles and Seattle fall under the Pacific Time Zone.
+
+<p>The thickness of links be&shy;tween cities encodes the relative frequency of flights between two cities: thicker links represent more frequent flights.
+
+<p>Links are directed: for exam&shy;ple, while 2.84% of flights go from Atlanta to Other Cities, 2.89% go in the opposite direction. Links are colored by the more fre&shy;quent origin.
+
+
+
+<p>Built with <a href="http://d3js.org/">D3</a>.</aside>
+<body>
+<script src="lib/d3.js" charset="utf-8"></script>
+<script src="lib/queue.js"></script>
+<script>
+
+var width = 720,
+    height = 720,
+    outerRadius = Math.min(width, height) / 2 - 10,
+    innerRadius = outerRadius - 24;
+
+var formatPercent = d3.format(".2%");
+
+var arc = d3.svg.arc()
+    .innerRadius(innerRadius)
+    .outerRadius(outerRadius);
+
+var layout = d3.layout.chord()
+    .padding(.04)
+    .sortSubgroups(d3.descending)
+    .sortChords(d3.ascending);
+
+var color_s = d3.scale.linear()
+        .range(["#FF7F00","#377EB8","#F781BF","#A0522D", "#984EA3", "#4DAF4A"]);
+
+var legendText = ["Eastern Time", "Central Time", "Mountain Time", "Pacific Time", "Hawaii Time", "Other Cities"];
+
+
+var path = d3.svg.chord()
+    .radius(innerRadius);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("id", "circle")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+
+svg.append("circle")
+    .attr("r", outerRadius);
+
+color_s.domain([0, 1, 2, 3, 4, 5])
+
+var legend = d3.select("body").append("svg")
+      .attr("class", "legend")
+      .attr("width", 140)
+      .attr("height", 200)
+    .selectAll("g")
+      .data(color_s.domain().slice())
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color_s);
+
+  legend.append("text")
+  .data(legendText)
+      .attr("x", 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .text(function(d) { return d; });
+
+queue()
+    .defer(d3.csv, 'flights-airports.csv')
+    .defer(d3.json, 'flights-matrix.json')
+    .await(ready);
+
+function ready(error, cities, matrix) {
+  if (error) throw error;
+
+
+  // Compute the chord layout.
+  layout.matrix(matrix);
+
+  // Add a group per neighborhood.
+  var group = svg.selectAll(".group")
+      .data(layout.groups)
+    .enter().append("g")
+      .attr("class", "group")
+      .on("mouseover", mouseover);
+
+  // Add a mouseover title.
+  group.append("title").text(function(d, i) {
+    return cities[i].ORIGIN  + ", " + cities[i].name + ": " + formatPercent(d.value) + " of origins" + "\n" 
+    + cities[i].ORIGIN + ": " + cities[i].airport_full_name;
+  });
+
+  // Add the group arc.
+  var groupPath = group.append("path")
+      .attr("id", function(d, i) { return "group" + i; })
+      .attr("d", arc)
+      .style("fill", function(d, i) { return cities[i].color; });
+
+  // Add a text label.
+  var groupText = group.append("text")
+      .attr("x", 6)
+      .attr("dy", 15);
+
+  groupText.append("textPath")
+      .attr("xlink:href", function(d, i) { return "#group" + i; })
+      .text(function(d, i) { return cities[i].name; });
+
+  // Remove the labels that don't fit. :(
+  groupText.filter(function(d, i) { return groupPath[0][i].getTotalLength() / 2 - 28 < this.getComputedTextLength(); })
+      .remove();
+
+  
+
+  // Add the chords.
+  var chord = svg.selectAll(".chord")
+      .data(layout.chords)
+    .enter().append("path")
+      .attr("class", "chord")
+      .style("fill", function(d) { return cities[d.source.index].color; })
+      .attr("d", path);
+
+  // Add an elaborate mouseover title for each chord.
+  chord.append("title").text(function(d) {
+    return cities[d.source.index].ORIGIN
+        + " → " + cities[d.target.index].ORIGIN
+        + ": " + formatPercent(d.source.value)
+        + "\n" + cities[d.target.index].ORIGIN
+        + " → " + cities[d.source.index].ORIGIN
+        + ": " + formatPercent(d.target.value);
+  });
+
+  function mouseover(d, i) {
+    chord.classed("fade", function(p) {
+      return p.source.index != i
+          && p.target.index != i;
+    });
+  }
+
+}
+
+
+</script>
+</body>
+<p class="attribution">Source: <a href="https://bost.ocks.org/mike/">Mike Bostock's blocks</a>.
+
+<p>Credits for this chord diagram go to Mike Bostock, one of the creators of D3.js. He developed a chord diagram on Uber rides by neighborhood which is the inspiration for this one.<p>
+
