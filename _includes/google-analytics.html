@@ -11,22 +11,19 @@
 </script>
 
 <script>
-$(document).ready(function(){
-	$('.ga-link').on('click', function(){
-		if (typeof(ga)!=="undefined"){
-			ga('send',{
-				hitType: 'event',
-				eventCategory: 'click',
-				eventAction: 'outbound',
-				eventLabel: $(this).attr('href')
-			});	  		
-	  	}
-	});
-)};
-
+/**
+* Function that tracks a click on an outbound link in Analytics.
+* This function takes a valid URL string as an argument, and uses that URL string
+* as the event label. Setting the transport method to 'beacon' lets the hit be sent
+* using 'navigator.sendBeacon' in browser that support it.
+*/
+var trackOutboundLink = function(url) {
+   ga('send', 'event', 'outbound', 'click', url, {
+     'transport': 'beacon',
+     'hitCallback': function(){document.location = url;}
+   });
+}
 </script>
 
-<a href="https://github.com/shivathudi" class='ga-link' target='_blank'>
 
-<a href="" class="ga-link" target='_blank'></a>
-
+<a href="https://github.com/shivathudi" onclick="trackOutboundLink('https://github.com/shivathudi'); return false;">Check out example.com</a>
