@@ -1,5 +1,86 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-06-02T00:35:17-07:00</updated><id>http://localhost:4000/</id><title type="html">Shiva Thudi</title><subtitle>Hi! I’m Shiva Thudi, and this is my blog about the machine learning and data visualization projects I have done.
-</subtitle><entry><title type="html">Interactive visualizations using D3.js and D3 wrappers in Shiny</title><link href="http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights.html" rel="alternate" type="text/html" title="Interactive visualizations using D3.js and D3 wrappers in Shiny" /><published>2017-04-30T20:43:02-07:00</published><updated>2017-04-30T20:43:02-07:00</updated><id>http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights.html">&lt;p&gt;I think D3.js is the one of the best libraries out there for interactive visualizations. This post will cover two cases; the first one uses D3.js while the second one uses D3 wrappers in Shiny.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-06-15T23:49:29-07:00</updated><id>http://localhost:4000/</id><title type="html">Shiva Thudi</title><subtitle>Hi! I’m Shiva Thudi, and this is my blog about the machine learning and data visualization projects I have done.
+</subtitle><entry><title type="html">Matrix multiplication using the Divide and Conquer paradigm</title><link href="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html" rel="alternate" type="text/html" title="Matrix multiplication using the Divide and Conquer paradigm" /><published>2017-06-15T20:43:02-07:00</published><updated>2017-06-15T20:43:02-07:00</updated><id>http://localhost:4000/jekyll/update/2017/06/15/matr-mult</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html">&lt;p&gt;In this post I will explore how the divide and conquer algorithm approach is applied to matrix multiplication. I will start with a brief introduction about how matrix multiplication is generally observed and implemented, apply different algorithms (such as Naive and Strassen) that are used in practice with both pseduocode and Python code, and then end with an analysis of their runtime complexities.&lt;/p&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Matrix multiplication is a fundamental problem in computing. Tim Roughgarden in his Algorithms course on Coursera states that&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Computers as long as they’ve been in use from the time they were invented uptil today, a lot of their cycles is spent multiplying matrices. It just comes up all the time in important applications.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Since it is such a central operation in many applications, matrix multiplication is one of the most well-studied problems in computing. So how are matrices multiplied again?&lt;/p&gt;
+
+&lt;p&gt;Let us start with two square matrices A and B which are both of size n x n. In the product C = A X B we define the entry $c_{ij}$,  the entry in the ith row and the jth column of A,  as being the dot product of the ith row of A with the jth column of B. Taking the dot product of vectors just means that you take the products of the individual components and then add up the results.&lt;/p&gt;
+
+&lt;p&gt;The following illustrations, taken from Introduction to Algortihms, Cormen et. al, sum this up nicely:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/illust_1.png&quot; alt=&quot;illust1&quot; height=&quot;75px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/square-multiply.png&quot; alt=&quot;illust2&quot; height=&quot;250px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The first for loop at line 3 computes the entries of each row i, and within a given row i, the for loop from line 4 computes each of the entries c_{ij} for each column j. Line 5 computes each entry c_{ij} using the dot product, which was defined in the equation above. We can translate the pseudocode to Python code as follows:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import numpy as np
+n,n = np.shape(A)
+C = np.eye(n)
+for i in range(n):
+	for j in range(n):
+		C[i][j] = 0
+		for k in range (n):
+			C[i][j] += A[i][k]*B[k][j]
+return C
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Each of the triply-nested for loops above runs for exactly n iterations, which means that the algorithm above has a runtime complexity of \theta(n^3). Roughgarden poses the following question:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;So the question as always for the keen algorithm designer is, can we do better? Can we beat n cube time for multiplying two matrices?&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Cormen et al. note that:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;You might at first think that any matrix multiplication algorithm must take  omega(n^3) time, since the natural definition of matrix multiplication requires that many multiplications. You would be incorrect, however: we have a way to multiply matrices in small o(n^3) time. Strassen’s remarkable recursive algorithm for multiplying nxn matrices runs in theta (n^lg 7) time.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;So how is Strassen’s algorithm better? To answer that, we will first look at how we can apply the divide and conquer approach for multiplying matrices.&lt;/p&gt;
+
+&lt;h2 id=&quot;divide-and-conquer-using-block-partitioning&quot;&gt;Divide and Conquer using Block Partitioning&lt;/h2&gt;
+
+&lt;p&gt;Let us first assume that n is an exact power of 2 in each of the n x n matrices for A and B. This simplyifying assumption allows us to break a big n x n matrix into smaller blocks or quadrants of size n/2 x n/2, while also ensuring that the dimension n/2 is an integer. This process is termed as &lt;strong&gt;block partitioning&lt;/strong&gt; and the good part about it is that once matrices are split into blocks and multiplied, the blocks behave as if they were atomic elements. The product of A and B can then be expressed in terms of its quadrants. This gives us an idea of a recursive approach where we can keep partitioning matrices into quadrants until they are small enough to be multiplied in the naive way.&lt;/p&gt;
+
+&lt;p&gt;The following equations from Cormen et al. illustrate this process:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/cormen_recur.png&quot; alt=&quot;cormen1&quot; height=&quot;300px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In each of the 4 equations above we have two multiplications of n/2 x n/2 matrices that are then added together. A recursive, divide-and-conquer algorithm is then:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/cormen_recur2.png&quot; alt=&quot;cormen2&quot; height=&quot;300px&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;todo-add-python-code-later&quot;&gt;TODO: Add Python code later&lt;/h4&gt;
+
+&lt;p&gt;For multiplying two matrices of size n x n, we make 8 recursive calls above, each on a matrix/subproblem with size n/2 x n/2. Each of these recursive calls multiplies two n/2 x n/2 matrices, which are then added together. For the addition, we add two matrices of size n^2/4, so each addition takes theta(n^2/4) time. We can write this recurrence in the form of the following equations (taken from Cormet et al.):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/recurrence.png&quot; alt=&quot;recurrence&quot; height=&quot;60px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The master theorem is a way of figuring out the runtime complexity of algorithms that use the divide and conquer approach, where subproblems are of equal size. It was popularized by Cormen et al. Roughgarden refers to it as a &lt;em&gt;“black box for solving recurrences”&lt;/em&gt;. The following equations are taken from his slides:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/master1.png&quot; alt=&quot;master1&quot; height=&quot;200px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/master2.png&quot; alt=&quot;master2&quot; height=&quot;200px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For our block partitioning approach, we saw that we had 8 recursive calls (a=8), where each subproblem was of size n/2 x n/2 (b=2). Outside of the recursive calls, we were performing additions that were of the order n^2/4 since each quadrant matrix had those many entries. So we doing work of the order of theta(n^2) outside the recursive calls (d=2). This corresponds to case 3 of the master theorem since a (8) is more than b^d (2^2 = 4).&lt;/p&gt;
+
+&lt;p&gt;Using the master theorem, we can say that the runtime complexity is big O(n^(log a base b)), which is big O(n^3). This is no better than the straightforward iterative algorithm!&lt;/p&gt;
+
+&lt;h2 id=&quot;strassens-algorithm&quot;&gt;Strassen’s Algorithm&lt;/h2&gt;
+
+&lt;p&gt;Strassen’s algorithm makes use of the same divide an conquer approach as above, but instead uses only 7 recursive calls rather than 8. This is enough to reduce the runtime complexity to sub-cubic time! See the following quote from Cormen:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The key to Strassen’s method is to make the recursion tree slightly less bushy. Strassen’s method is not at all obvious. (This might be the biggest understatement in this book.)&lt;/p&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">In this post I will explore how the divide and conquer algorithm approach is applied to matrix multiplication. I will start with a brief introduction about how matrix multiplication is generally observed and implemented, apply different algorithms (such as Naive and Strassen) that are used in practice with both pseduocode and Python code, and then end with an analysis of their runtime complexities.</summary></entry><entry><title type="html">Interactive visualizations using D3.js and D3 wrappers in Shiny</title><link href="http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights.html" rel="alternate" type="text/html" title="Interactive visualizations using D3.js and D3 wrappers in Shiny" /><published>2017-04-30T20:43:02-07:00</published><updated>2017-04-30T20:43:02-07:00</updated><id>http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights.html">&lt;p&gt;I think D3.js is the one of the best libraries out there for interactive visualizations. This post will cover two cases; the first one uses D3.js while the second one uses D3 wrappers in Shiny.&lt;/p&gt;
 
 &lt;h3 id=&quot;domestic-flights-by-city-in-the-us&quot;&gt;Domestic Flights by City in the US&lt;/h3&gt;
 
