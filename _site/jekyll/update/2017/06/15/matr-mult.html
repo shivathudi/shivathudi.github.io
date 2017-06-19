@@ -77,11 +77,11 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>In this post I will explore how the divide and conquer algorithm approach is applied to matrix multiplication. I will start with a brief introduction about how matrix multiplication is generally observed and implemented, apply different algorithms (such as Naive and Strassen) that are used in practice with both pseduocode and Python code, and then end with an analysis of their runtime complexities.</p>
+    <p>In this post I will explore how the divide and conquer algorithm approach is applied to matrix multiplication. I will start with a brief introduction about how matrix multiplication is generally observed and implemented, apply different algorithms (such as Naive and Strassen) that are used in practice with both pseduocode and Python code, and then end with an analysis of their runtime complexities. There will be illustrations along the way, which are taken from Cormen’s textbook <em>Introduction to Algorithms</em> and Tim Roughgarden’s slides from his <em>Algorithms specialization on Coursera</em>.</p>
 
 <h2 id="introduction">Introduction</h2>
 
-<p>Matrix multiplication is a fundamental problem in computing. Tim Roughgarden in his Algorithms course on Coursera states that</p>
+<p>Matrix multiplication is a fundamental problem in computing. Tim Roughgarden states that</p>
 <blockquote>
   <p>Computers as long as they’ve been in use from the time they were invented uptil today, a lot of their cycles is spent multiplying matrices. It just comes up all the time in important applications.</p>
 </blockquote>
@@ -94,7 +94,7 @@
 
 <p><img src="http://localhost:4000/assets/illust_1.png" alt="illust1" height="75px" /></p>
 
-<p><img src="http://localhost:4000/assets/square-multiply.png" alt="illust2" height="250px" /></p>
+<p><img src="http://localhost:4000/assets/square-multiply.png" alt="illust2" title="Natural/Naive method" height="250px" /></p>
 
 <p>The first for loop at line 3 computes the entries of each row i, and within a given row i, the for loop from line 4 computes each of the entries c_{ij} for each column j. Line 5 computes each entry c_{ij} using the dot product, which was defined in the equation above. We can translate the pseudocode to Python code as follows:</p>
 
@@ -130,17 +130,17 @@ return C
 
 <p>The following equations from Cormen et al. illustrate this process:</p>
 
-<p><img src="http://localhost:4000/assets/cormen_recur.png" alt="cormen1" height="300px" /></p>
+<p><img src="http://localhost:4000/assets/cormen_recur.png" alt="cormen1" title="Block Partitioning" height="300px" /></p>
 
 <p>In each of the 4 equations above we have two multiplications of n/2 x n/2 matrices that are then added together. A recursive, divide-and-conquer algorithm is then:</p>
 
-<p><img src="http://localhost:4000/assets/cormen_recur2.png" alt="cormen2" height="300px" /></p>
+<p><img src="http://localhost:4000/assets/cormen_recur2.png" alt="cormen2" title="Divide and Conquer with Block Partitioning" height="300px" /></p>
 
 <h4 id="todo-add-python-code-later">TODO: Add Python code later</h4>
 
 <p>For multiplying two matrices of size n x n, we make 8 recursive calls above, each on a matrix/subproblem with size n/2 x n/2. Each of these recursive calls multiplies two n/2 x n/2 matrices, which are then added together. For the addition, we add two matrices of size n^2/4, so each addition takes theta(n^2/4) time. We can write this recurrence in the form of the following equations (taken from Cormet et al.):</p>
 
-<p><img src="http://localhost:4000/assets/recurrence.png" alt="recurrence" height="60px" /></p>
+<p><img src="http://localhost:4000/assets/recurrence.png" alt="recurrence" title="Recurrence with Block Partitioning" height="60px" /></p>
 
 <p>The master theorem is a way of figuring out the runtime complexity of algorithms that use the divide and conquer approach, where subproblems are of equal size. It was popularized by Cormen et al. Roughgarden refers to it as a <em>“black box for solving recurrences”</em>. The following equations are taken from his slides:</p>
 
@@ -148,17 +148,50 @@ return C
 
 <p><img src="http://localhost:4000/assets/master2.png" alt="master2" height="200px" /></p>
 
-<p>For our block partitioning approach, we saw that we had 8 recursive calls (a=8), where each subproblem was of size n/2 x n/2 (b=2). Outside of the recursive calls, we were performing additions that were of the order n^2/4 since each quadrant matrix had those many entries. So we doing work of the order of theta(n^2) outside the recursive calls (d=2). This corresponds to case 3 of the master theorem since a (8) is more than b^d (2^2 = 4).</p>
+<p>For our block partitioning approach, we saw that we had 8 recursive calls (a=8), where each subproblem was of size n/2 x n/2 (b=2). Outside of the recursive calls, we were performing additions that were of the order n^2/4 since each quadrant matrix had those many entries. So we were doing work of the order of theta(n^2) outside of the recursive calls (d=2). This corresponds to case 3 of the master theorem since a (8) is more than b^d (2^2 = 4).</p>
 
 <p>Using the master theorem, we can say that the runtime complexity is big O(n^(log a base b)), which is big O(n^3). This is no better than the straightforward iterative algorithm!</p>
 
 <h2 id="strassens-algorithm">Strassen’s Algorithm</h2>
 
-<p>Strassen’s algorithm makes use of the same divide an conquer approach as above, but instead uses only 7 recursive calls rather than 8. This is enough to reduce the runtime complexity to sub-cubic time! See the following quote from Cormen:</p>
+<p>Strassen’s algorithm makes use of the same divide and conquer approach as above, but instead uses only 7 recursive calls rather than 8. This is enough to reduce the runtime complexity to sub-cubic time! See the following quote from Cormen:</p>
 
 <blockquote>
   <p>The key to Strassen’s method is to make the recursion tree slightly less bushy. Strassen’s method is not at all obvious. (This might be the biggest understatement in this book.)</p>
 </blockquote>
+
+<p>We save one recursive call, but have several new additions of n/2 x n/2 matrices. Strassen’s algorithm has four steps:</p>
+
+<ol>
+  <li>
+    <p>Divide the input matrices A and B into n/2 x n/2 submatrices, which takes theta(1) time by performing index calculations.</p>
+  </li>
+  <li>
+    <p>Create 10 matrices S1, S2, S3, … S10 each of which is the sum or difference of two matrices created in step 1. We can create all 10 matrices in theta(n^2) time.</p>
+  </li>
+</ol>
+
+<table>
+  <tbody>
+    <tr>
+      <td><img src="http://localhost:4000/assets/strassen_sumatrices_10.png" alt="strassen_sumatrices_10" height="200px" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<ol>
+  <li>Using the submatrices created from both of the steps above, recursively compute seven matrix products P1, P2, … P7. Each matrix Pi is of size n/2 x n/2.</li>
+</ol>
+
+<ul>
+  <li><img src="http://localhost:4000/assets/strassen_recur_7.png" alt="strassen_recur_7" height="150px" /></li>
+</ul>
+
+<p>The products that we compute in our recursive calls are the ones from the middle column above. The right column just shows what these products equal in terms of the original submatrices from step 1.</p>
+
+<ol>
+  <li>Get the desired submatrices C11, C12, C21, and C22 of the result matrix C by adding and subtracting various combinations of the Pi submatrices. These four submatrices can be computed in theta(n^2) time.</li>
+</ol>
 
 
   </div>
@@ -193,7 +226,7 @@ return C
         <ul class="social-media-list">
           
           <li>
-            <a href="https://github.com/shivathudi"><span class="icon icon--github"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+            <a href="https://github.com/shivathudi" onClick="ga('send', 'event', 'outbound', 'click', 'github_link', 0);" ><span class="icon icon--github"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
 </span><span class="username">shivathudi</span></a>
 
           </li>
