@@ -8,4 +8,4 @@ Hi! I’m Shiva, a data science enthusiast graduating from the University of San
 
 I currently work part-time as a data science intern at [Vungle][vungle-link], where I’ve been since October 2016. Vungle provides in-app video advertising technologies to both advertisers and publishers in the mobile app industry.
 
-[vungle-link]: [https://vungle.com/]
+[vungle-link]: https://vungle.com/
