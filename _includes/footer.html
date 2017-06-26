@@ -15,7 +15,7 @@
             {% endif %}
             </li>
             {% if site.email %}
-            <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+            <li><a href="mailto:{{ site.email }}" onClick="ga('send', 'event', 'outbound-link', 'click', 'email_link', {'dimension1': 'personal_email', 'metric1': 1});" ><span class="icon icon--github">{{ site.email }}</a></li>
             {% endif %}
         </ul>
       </div>
