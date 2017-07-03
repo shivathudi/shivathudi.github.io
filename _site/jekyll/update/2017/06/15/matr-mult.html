@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Matrix multiplication using the Divide and Conquer paradigm</title>
-  <meta name="description" content="In this post I will explore how the divide and conquer algorithm approach is applied to matrix multiplication. I will start with a brief introduction about h...">
+  <meta name="description" content="">
 
   <link rel="stylesheet" href="/assets/main.css">
   <link rel="canonical" href="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html">
@@ -77,18 +77,52 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>In this post I will explore how the divide and conquer algorithm approach is applied to matrix multiplication. I will start with a brief introduction about how matrix multiplication is generally observed and implemented, apply different algorithms (such as Naive and Strassen) that are used in practice with both pseduocode and Python code, and then end with an analysis of their runtime complexities. There will be illustrations along the way, which are taken from Cormen’s textbook <em>Introduction to Algorithms</em> and Tim Roughgarden’s slides from his <em>Algorithms specialization on Coursera</em>.</p>
+    <script type="text/javascript" async="" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 
-<h2 id="introduction">Introduction</h2>
+<p>In this post I will explore how the divide and conquer algorithm approach is applied to matrix multiplication. I will start with a brief introduction about how matrix multiplication is generally observed and implemented, apply different algorithms (such as Naive and Strassen) that are used in practice with both pseduocode and Python code, and then end with an analysis of their runtime complexities. There will be illustrations along the way, which are taken from Cormen’s textbook <em>Introduction to Algorithms</em> and Tim Roughgarden’s slides from his <em>Algorithms specialization on Coursera</em>.</p>
+
+<h2 id="introduction-and-motivation">Introduction and Motivation</h2>
 
 <p>Matrix multiplication is a fundamental problem in computing. Tim Roughgarden states that</p>
 <blockquote>
   <p>Computers as long as they’ve been in use from the time they were invented uptil today, a lot of their cycles is spent multiplying matrices. It just comes up all the time in important applications.</p>
 </blockquote>
 
-<p>Since it is such a central operation in many applications, matrix multiplication is one of the most well-studied problems in computing. So how are matrices multiplied again?</p>
+<p>From Wikipedia:</p>
+<blockquote>
+  <p>The definition of matrix multiplication is motivated by linear equations and linear transformations on vectors, which have numerous applications in applied mathematics, physics, and engineering.</p>
+</blockquote>
 
-<p>Let us start with two square matrices A and B which are both of size n x n. In the product C = A X B we define the entry $c_{ij}$,  the entry in the ith row and the jth column of A,  as being the dot product of the ith row of A with the jth column of B. Taking the dot product of vectors just means that you take the products of the individual components and then add up the results.</p>
+<p>Since it is such a central operation in many applications, matrix multiplication is one of the most well-studied problems in numerical computing. Various algorithms have been devised for computing the matrix product, especially for large matrices.</p>
+
+<h3 id="asymptotic-notation">Asymptotic notation</h3>
+
+<p>Before we start, let us briefly talk about asymptotic notation. Asymptotic notation is primarily used to describe the running times of algorithms, with each type of notation specifying a different bound (lower, upper, tight bound, etc.).</p>
+
+<ul>
+  <li>
+    <p>Big-Theta: <script type="math/tex">\Theta</script>-notation bounds a function to within constant factors.</p>
+  </li>
+  <li>
+    <p>Big-Oh: <script type="math/tex">O</script>-notation gives an upper bound for a function to within a constant factor.</p>
+  </li>
+  <li>
+    <p>Big-Omega: <script type="math/tex">\Omega</script>-notation gives a lower bound for a function to within a constant factor.</p>
+  </li>
+</ul>
+
+<p><img src="http://localhost:4000/assets/big.png" alt="illust100" /></p>
+
+<p>Small o-notation is used to denote an upper bound that is not asymptotically tight. The definitions of O-notation and o-notation are similar, but the main difference is that in <script type="math/tex">f(n) = O(g(n))</script>, the bound <script type="math/tex">% <![CDATA[
+0 <= f(n) <= c(g(n)) %]]></script> holds for some constant c &gt; 0, but in <script type="math/tex">f(n) = o(g(n))</script>, the bound <script type="math/tex">% <![CDATA[
+0 <= f(n) < c(g(n)) %]]></script> holds for all constants c &gt; 0. By analogy, <script type="math/tex">\omega</script>-notation (small omega) is to  <script type="math/tex">\Omega</script>-notation (big omega) as o-notation is to O-notation. Cormen draws an analogy between the asymptotic comparison of two functions f and g and the comparison of two real numbers a and b as follows:</p>
+
+<p><img src="http://localhost:4000/assets/analogy.png" alt="illust100" height="150px" /></p>
+
+<h3 id="naive-matrix-multiplication">Naive matrix multiplication</h3>
+
+<p>Let us start with two square matrices A and B which are both of size n by n. In the product C = A X B we define the entry <script type="math/tex">c_{ij}</script>,  the entry in the <script type="math/tex">i^{th}</script> row and the <script type="math/tex">j^{th}</script> column of A,  as being the dot product of the <script type="math/tex">i^{th}</script> row of A with the <script type="math/tex">j^{th}</script> column of B. Taking the dot product of vectors just means that you take the products of the individual components and then add up the results.</p>
 
 <p>The following illustrations, taken from Introduction to Algortihms, Cormen et. al, sum this up nicely:</p>
 
@@ -96,7 +130,7 @@
 
 <p><img src="http://localhost:4000/assets/square-multiply.png" alt="illust2" title="Natural/Naive method" height="250px" /></p>
 
-<p>The first for loop at line 3 computes the entries of each row i, and within a given row i, the for loop from line 4 computes each of the entries c_{ij} for each column j. Line 5 computes each entry c_{ij} using the dot product, which was defined in the equation above. We can translate the pseudocode to Python code as follows:</p>
+<p>The first for loop at line 3 computes the entries of each row i, and within a given row i, the for loop from line 4 computes each of the entries <script type="math/tex">c_{ij}</script> for each column j. Line 5 computes each entry <script type="math/tex">c_{ij}</script> using the dot product, which was defined in the equation above. We can translate the pseudocode to Python code as follows:</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>import numpy as np
 n,n = np.shape(A)
@@ -110,16 +144,16 @@ return C
 </code></pre>
 </div>
 
-<p>Each of the triply-nested for loops above runs for exactly n iterations, which means that the algorithm above has a runtime complexity of \theta(n^3). Roughgarden poses the following question:</p>
+<p>Each of the triply-nested for loops above runs for exactly n iterations, which means that the algorithm above has a runtime complexity of <script type="math/tex">\Theta(n^3)</script>. Roughgarden poses the following question:</p>
 
 <blockquote>
-  <p>So the question as always for the keen algorithm designer is, can we do better? Can we beat n cube time for multiplying two matrices?</p>
+  <p>So the question as always for the keen algorithm designer is, can we do better? Can we beat <script type="math/tex">n^3</script> time for multiplying two matrices?</p>
 </blockquote>
 
 <p>Cormen et al. note that:</p>
 
 <blockquote>
-  <p>You might at first think that any matrix multiplication algorithm must take  omega(n^3) time, since the natural definition of matrix multiplication requires that many multiplications. You would be incorrect, however: we have a way to multiply matrices in small o(n^3) time. Strassen’s remarkable recursive algorithm for multiplying nxn matrices runs in theta (n^lg 7) time.</p>
+  <p>You might at first think that any matrix multiplication algorithm must take <script type="math/tex">\omega(n^3)</script> time, since the natural definition of matrix multiplication requires that many multiplications. You would be incorrect, however: we have a way to multiply matrices in  <script type="math/tex">o(n^3)</script> time. Strassen’s remarkable recursive algorithm for multiplying n by n matrices runs in <script type="math/tex">\Theta (n^{lg7})</script> time.</p>
 </blockquote>
 
 <p>So how is Strassen’s algorithm better? To answer that, we will first look at how we can apply the divide and conquer approach for multiplying matrices.</p>
@@ -136,9 +170,7 @@ return C
 
 <p><img src="http://localhost:4000/assets/cormen_recur2.png" alt="cormen2" title="Divide and Conquer with Block Partitioning" height="300px" /></p>
 
-<h4 id="todo-add-python-code-later">TODO: Add Python code later</h4>
-
-<p>For multiplying two matrices of size n x n, we make 8 recursive calls above, each on a matrix/subproblem with size n/2 x n/2. Each of these recursive calls multiplies two n/2 x n/2 matrices, which are then added together. For the addition, we add two matrices of size n^2/4, so each addition takes theta(n^2/4) time. We can write this recurrence in the form of the following equations (taken from Cormet et al.):</p>
+<p>For multiplying two matrices of size n x n, we make 8 recursive calls above, each on a matrix/subproblem with size n/2 x n/2. Each of these recursive calls multiplies two n/2 x n/2 matrices, which are then added together. For the addition, we add two matrices of size <script type="math/tex">n^2/4</script>, so each addition takes <script type="math/tex">\Theta(n^2/4)</script> time. We can write this recurrence in the form of the following equations (taken from Cormet et al.):</p>
 
 <p><img src="http://localhost:4000/assets/recurrence.png" alt="recurrence" title="Recurrence with Block Partitioning" height="60px" /></p>
 
@@ -148,9 +180,9 @@ return C
 
 <p><img src="http://localhost:4000/assets/master2.png" alt="master2" height="200px" /></p>
 
-<p>For our block partitioning approach, we saw that we had 8 recursive calls (a=8), where each subproblem was of size n/2 x n/2 (b=2). Outside of the recursive calls, we were performing additions that were of the order n^2/4 since each quadrant matrix had those many entries. So we were doing work of the order of theta(n^2) outside of the recursive calls (d=2). This corresponds to case 3 of the master theorem since a (8) is more than b^d (2^2 = 4).</p>
+<p>For our block partitioning approach, we saw that we had 8 recursive calls <script type="math/tex">(a=8)</script>, where each subproblem was of size n/2 x n/2 <script type="math/tex">(b=2)</script>. Outside of the recursive calls, we were performing additions that were of the order <script type="math/tex">n^2/4</script> since each quadrant matrix had those many entries. So we were doing work of the order of <script type="math/tex">\Theta(n^2)</script> outside of the recursive calls (<script type="math/tex">d=2</script>). This corresponds to case 3 of the master theorem since <script type="math/tex">a</script> (8) is more than <script type="math/tex">b^d</script> (<script type="math/tex">2^2 = 4</script>).</p>
 
-<p>Using the master theorem, we can say that the runtime complexity is big O(n^(log a base b)), which is big O(n^3). This is no better than the straightforward iterative algorithm!</p>
+<p>Using the master theorem, we can say that the runtime complexity is big <script type="math/tex">O(n^{log_b a})</script>, which is big <script type="math/tex">O(n^{log_2 8})</script>or big <script type="math/tex">O(n^3)</script>. This is no better than the straightforward iterative algorithm!</p>
 
 <h2 id="strassens-algorithm">Strassen’s Algorithm</h2>
 
@@ -162,14 +194,9 @@ return C
 
 <p>We save one recursive call, but have several new additions of n/2 x n/2 matrices. Strassen’s algorithm has four steps:</p>
 
-<ol>
-  <li>
-    <p>Divide the input matrices A and B into n/2 x n/2 submatrices, which takes theta(1) time by performing index calculations.</p>
-  </li>
-  <li>
-    <p>Create 10 matrices S1, S2, S3, … S10 each of which is the sum or difference of two matrices created in step 1. We can create all 10 matrices in theta(n^2) time.</p>
-  </li>
-</ol>
+<p>1)  Divide the input matrices A and B into <script type="math/tex">n/2</script> x <script type="math/tex">n/2</script> submatrices, which takes <script type="math/tex">\Theta(1)</script> time by performing index calculations.</p>
+
+<p>2) Create 10 matrices <script type="math/tex">S_1</script>, <script type="math/tex">S_2</script>, <script type="math/tex">S_3</script>, … <script type="math/tex">S_{10}</script> each of which is the sum or difference of two matrices created in step 1. We can create all 10 matrices in <script type="math/tex">\Theta(n^2)</script> time.</p>
 
 <table>
   <tbody>
@@ -179,19 +206,54 @@ return C
   </tbody>
 </table>
 
-<ol>
-  <li>Using the submatrices created from both of the steps above, recursively compute seven matrix products P1, P2, … P7. Each matrix Pi is of size n/2 x n/2.</li>
-</ol>
+<p>3) Using the submatrices created from both of the steps above, recursively compute seven matrix products <script type="math/tex">P_1</script>, <script type="math/tex">P_2</script>, … <script type="math/tex">P_7</script>. Each matrix <script type="math/tex">P_{i}</script> is of size n/2 x n/2.</p>
 
-<ul>
-  <li><img src="http://localhost:4000/assets/strassen_recur_7.png" alt="strassen_recur_7" height="150px" /></li>
-</ul>
+<p><img src="http://localhost:4000/assets/strassen_recur_7.png" alt="strassen_recur_7" height="150px" /></p>
 
 <p>The products that we compute in our recursive calls are the ones from the middle column above. The right column just shows what these products equal in terms of the original submatrices from step 1.</p>
 
+<p>4) Get the desired submatrices <script type="math/tex">C_{11}</script>, <script type="math/tex">C_{12}</script>, <script type="math/tex">C_{21}</script>, and <script type="math/tex">C_{22}</script> of the result matrix C by adding and subtracting various combinations of the <script type="math/tex">P_i</script> submatrices. These four submatrices can be computed in <script type="math/tex">\Theta(n^2)</script> time.</p>
+
+<p><img src="http://localhost:4000/assets/C1.png" alt="" title="Recurrence with Block Partitioning" height="40px" /></p>
+
+<p><img src="http://localhost:4000/assets/C2.png" alt="" title="Recurrence with Block Partitioning" height="35px" /></p>
+
+<p><img src="http://localhost:4000/assets/C3.png" alt="" title="Recurrence with Block Partitioning" height="35px" /></p>
+
+<p><img src="http://localhost:4000/assets/C4.png" alt="" title="Recurrence with Block Partitioning" height="30px" /></p>
+
+<p>Using the above steps, we get the recurrence of the following format:</p>
+
+<p><img src="http://localhost:4000/assets/recurrence2.png" alt="recurrence2" title="Recurrence with Block Partitioning" height="60px" /></p>
+
+<p>In Strassen’s algorithm, we saw that we had 7 recursive calls <script type="math/tex">(a=7)</script>, where each subproblem or submatrix was of size n/2 x n/2 <script type="math/tex">(b=2)</script>. Outside of the recursive calls, we were performing work on the order of <script type="math/tex">\Theta(n^2)</script> (<script type="math/tex">d=2</script>). This also corresponds to case 3 of the master theorem since <script type="math/tex">a</script> (7) is more than <script type="math/tex">b^d</script> (<script type="math/tex">2^2 = 4</script>).</p>
+
+<p>However, unlike the first case, the runtime complexity here is big <script type="math/tex">O(n^{log_b a})</script>, which is big <script type="math/tex">O(n^{log_2 7})</script> or big <script type="math/tex">O(n^{2.81})</script>. This beats the straightforward iterative approach &amp; the regular block partitioning approach asymptotically!</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>We showed how Strassen’s algorithm was asymptotically faster than the basic procedure of multiplying matrices. Better asymptotic upper bounds for matrix multiplication have been found since Strassen’s algorithm came out in 1969. The most asymptotically efficient algorithm for multiplying n x n matrices to date is Coppersmith and Winograd’s algorithm, which has a running time of <script type="math/tex">O(n^{2.376})</script>.</p>
+
+<p>However, in practice, Strassen’s algorithm is often not the method of choice for matrix multiplication. Cormen outlines the following four reasons for why:</p>
+
 <ol>
-  <li>Get the desired submatrices C11, C12, C21, and C22 of the result matrix C by adding and subtracting various combinations of the Pi submatrices. These four submatrices can be computed in theta(n^2) time.</li>
+  <li>
+    <p>The constant factor hidden in the <script type="math/tex">O(n^{log_2 7})</script> running time of Strassen’s algorithm is larger than the constant factor in the <script type="math/tex">O(n^{3})</script> SQUARE-MATRIX-MULTIPLY procedure.</p>
+  </li>
+  <li>
+    <p>When the matrices are sparse, methods tailored for sparse matrices are faster.</p>
+  </li>
+  <li>
+    <p>Strassen’s algorithm is not quite as numerically stable as the regular approach. In other words, because of the limited precision of computer arithmetic on noninteger values, larger errors accumulate in Strassen’s algorithm than in SQUARE-MATRIX-MULTIPLY.</p>
+  </li>
+  <li>
+    <p>The submatrices formed at the levels of recursion consume space.</p>
+  </li>
 </ol>
+
+<p>Cormen et al describe how the latter two reasons were mitigated around 1990. They state that the difference in numerical stability was overemphasized and although Strassen’s algorithm is too numerically unstable for some applications, it is within acceptable limits for others. In practice, fast matrix-multiplication implementations for dense matrices use Strassen’s algorithm for matrix sizes above a <em>crossover point</em> and they switch to a simpler method once the subproblem size reduces to below the crossover point. The exact value of the crossover point is highly system dependent. Crossover points on various systems were found to range from 400 to 2150.</p>
+
+<p>In summary, even if algorithms like Strassen’s have lower asymptotic runtimes, they might not be implemented in practice due to issues with numerical stability. However, there can still be practical uses for them in certain scenarios, such as applying Strassen’s method when dealing with multiplications of large, dense matrices of a certain size.</p>
 
 
   </div>
@@ -217,7 +279,7 @@ return C
             
             </li>
             
-            <li><a href="mailto:shivathudi@gmail.com">shivathudi@gmail.com</a></li>
+            <li><a href="mailto:shivathudi@gmail.com" onClick="ga('send', 'event', 'outbound-link', 'click', 'email_link', {'dimension1': 'personal_email', 'metric1': 1});" ><span class="icon icon--github">shivathudi@gmail.com</a></li>
             
         </ul>
       </div>
@@ -226,8 +288,9 @@ return C
         <ul class="social-media-list">
           
           <li>
-            <a href="https://github.com/shivathudi" onClick="ga('send', 'event', 'outbound', 'click', 'github_link', 0);" ><span class="icon icon--github"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+            <a href="https://github.com/shivathudi" onClick="ga('send', 'event', 'outbound-link', 'click', 'github_link', {'dimension1': 'github', 'metric1': 1});" ><span class="icon icon--github"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
 </span><span class="username">shivathudi</span></a>
+
 
           </li>
           
