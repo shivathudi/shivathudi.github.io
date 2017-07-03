@@ -139,7 +139,7 @@ In Strassen's algorithm, we saw that we had 7 recursive calls $$(a=7)$$, where e
 
 However, unlike the first case, the runtime complexity here is big $$O(n^{log_b a})$$, which is big $$O(n^{log_2 7})$$ or big $$O(n^{2.81})$$. This beats the straightforward iterative approach & the regular block partitioning approach asymptotically!
 
-### Conclusion
+## Conclusion
 
 We showed how Strassen's algorithm was asymptotically faster than the basic procedure of multiplying matrices. Better asymptotic upper bounds for matrix multiplication have been found since Strassen's algorithm came out in 1969. The most asymptotically efficient algorithm for multiplying n x n matrices to date is Coppersmith and Winograd's algorithm, which has a running time of $$O(n^{2.376})$$.
 
