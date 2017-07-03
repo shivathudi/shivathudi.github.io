@@ -145,13 +145,13 @@ We showed how Strassen's algorithm was asymptotically faster than the basic proc
 
 However, in practice, Strassen's algorithm is often not the method of choice for matrix multiplication. Cormen outlines the following four reasons for why:
 
-1. The constant factor hidden in the $$O(n^{log_2 7})$$ running time of Strassen’s algorithm is larger than the constant factor in the $$O(n^{3})$$ SQUARE-MATRIX-MULTIPLY procedure.
-
-2. When the matrices are sparse, methods tailored for sparse matrices are faster.
-
-3. Strassen’s algorithm is not quite as numerically stable as the regular approach. In other words, because of the limited precision of computer arithmetic on noninteger values, larger errors accumulate in Strassen’s algorithm than in SQUARE-MATRIX-MULTIPLY.
-
-4. The submatrices formed at the levels of recursion consume space.
+> 1. The constant factor hidden in the $$O(n^{log_2 7})$$ running time of Strassen’s algorithm is larger than the constant factor in the > $$O(n^{3})$$ SQUARE-MATRIX-MULTIPLY procedure.
+>
+> 2. When the matrices are sparse, methods tailored for sparse matrices are faster.
+> 
+> 3. Strassen’s algorithm is not quite as numerically stable as the regular approach. In other words, because of the limited precision of computer arithmetic on noninteger values, larger errors accumulate in Strassen’s algorithm than in SQUARE-MATRIX-MULTIPLY.
+> 
+> 4. The submatrices formed at the levels of recursion consume space.
 
 Cormen et al describe how the latter two reasons were mitigated around 1990. They state that the difference in numerical stability was overemphasized and although Strassen’s algorithm is too numerically unstable for some applications, it is within acceptable limits for others. In practice, fast matrix-multiplication implementations for dense matrices use Strassen’s algorithm for matrix sizes above a *crossover point* and they switch to a simpler method once the subproblem size reduces to below the crossover point. The exact value of the crossover point is highly system dependent. Crossover points on various systems were found to range from 400 to 2150.
 

@@ -230,26 +230,28 @@ return C
 
 <p>However, unlike the first case, the runtime complexity here is big <script type="math/tex">O(n^{log_b a})</script>, which is big <script type="math/tex">O(n^{log_2 7})</script> or big <script type="math/tex">O(n^{2.81})</script>. This beats the straightforward iterative approach &amp; the regular block partitioning approach asymptotically!</p>
 
-<h3 id="conclusion">Conclusion</h3>
+<h2 id="conclusion">Conclusion</h2>
 
 <p>We showed how Strassen’s algorithm was asymptotically faster than the basic procedure of multiplying matrices. Better asymptotic upper bounds for matrix multiplication have been found since Strassen’s algorithm came out in 1969. The most asymptotically efficient algorithm for multiplying n x n matrices to date is Coppersmith and Winograd’s algorithm, which has a running time of <script type="math/tex">O(n^{2.376})</script>.</p>
 
 <p>However, in practice, Strassen’s algorithm is often not the method of choice for matrix multiplication. Cormen outlines the following four reasons for why:</p>
 
-<ol>
-  <li>
-    <p>The constant factor hidden in the <script type="math/tex">O(n^{log_2 7})</script> running time of Strassen’s algorithm is larger than the constant factor in the <script type="math/tex">O(n^{3})</script> SQUARE-MATRIX-MULTIPLY procedure.</p>
-  </li>
-  <li>
-    <p>When the matrices are sparse, methods tailored for sparse matrices are faster.</p>
-  </li>
-  <li>
-    <p>Strassen’s algorithm is not quite as numerically stable as the regular approach. In other words, because of the limited precision of computer arithmetic on noninteger values, larger errors accumulate in Strassen’s algorithm than in SQUARE-MATRIX-MULTIPLY.</p>
-  </li>
-  <li>
-    <p>The submatrices formed at the levels of recursion consume space.</p>
-  </li>
-</ol>
+<blockquote>
+  <ol>
+    <li>
+      <p>The constant factor hidden in the <script type="math/tex">O(n^{log_2 7})</script> running time of Strassen’s algorithm is larger than the constant factor in the &gt; <script type="math/tex">O(n^{3})</script> SQUARE-MATRIX-MULTIPLY procedure.</p>
+    </li>
+    <li>
+      <p>When the matrices are sparse, methods tailored for sparse matrices are faster.</p>
+    </li>
+    <li>
+      <p>Strassen’s algorithm is not quite as numerically stable as the regular approach. In other words, because of the limited precision of computer arithmetic on noninteger values, larger errors accumulate in Strassen’s algorithm than in SQUARE-MATRIX-MULTIPLY.</p>
+    </li>
+    <li>
+      <p>The submatrices formed at the levels of recursion consume space.</p>
+    </li>
+  </ol>
+</blockquote>
 
 <p>Cormen et al describe how the latter two reasons were mitigated around 1990. They state that the difference in numerical stability was overemphasized and although Strassen’s algorithm is too numerically unstable for some applications, it is within acceptable limits for others. In practice, fast matrix-multiplication implementations for dense matrices use Strassen’s algorithm for matrix sizes above a <em>crossover point</em> and they switch to a simpler method once the subproblem size reduces to below the crossover point. The exact value of the crossover point is highly system dependent. Crossover points on various systems were found to range from 400 to 2150.</p>
 

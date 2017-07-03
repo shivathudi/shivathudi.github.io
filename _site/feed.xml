@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-02T19:20:26-07:00</updated><id>http://localhost:4000/</id><title type="html">Shiva Thudi</title><subtitle>Hi! I’m Shiva Thudi, and this is my blog about the machine learning and data visualization projects I have done.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-02T19:29:35-07:00</updated><id>http://localhost:4000/</id><title type="html">Shiva Thudi</title><subtitle>Hi! I’m Shiva Thudi, and this is my blog about the machine learning and data visualization projects I have done.
 </subtitle><entry><title type="html">Matrix multiplication using the Divide and Conquer paradigm</title><link href="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html" rel="alternate" type="text/html" title="Matrix multiplication using the Divide and Conquer paradigm" /><published>2017-06-15T20:43:02-07:00</published><updated>2017-06-15T20:43:02-07:00</updated><id>http://localhost:4000/jekyll/update/2017/06/15/matr-mult</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html">&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML&quot;&gt;
 &lt;/script&gt;
 
@@ -152,26 +152,28 @@ return C
 
 &lt;p&gt;However, unlike the first case, the runtime complexity here is big &lt;script type=&quot;math/tex&quot;&gt;O(n^{log_b a})&lt;/script&gt;, which is big &lt;script type=&quot;math/tex&quot;&gt;O(n^{log_2 7})&lt;/script&gt; or big &lt;script type=&quot;math/tex&quot;&gt;O(n^{2.81})&lt;/script&gt;. This beats the straightforward iterative approach &amp;amp; the regular block partitioning approach asymptotically!&lt;/p&gt;
 
-&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 
 &lt;p&gt;We showed how Strassen’s algorithm was asymptotically faster than the basic procedure of multiplying matrices. Better asymptotic upper bounds for matrix multiplication have been found since Strassen’s algorithm came out in 1969. The most asymptotically efficient algorithm for multiplying n x n matrices to date is Coppersmith and Winograd’s algorithm, which has a running time of &lt;script type=&quot;math/tex&quot;&gt;O(n^{2.376})&lt;/script&gt;.&lt;/p&gt;
 
 &lt;p&gt;However, in practice, Strassen’s algorithm is often not the method of choice for matrix multiplication. Cormen outlines the following four reasons for why:&lt;/p&gt;
 
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;The constant factor hidden in the &lt;script type=&quot;math/tex&quot;&gt;O(n^{log_2 7})&lt;/script&gt; running time of Strassen’s algorithm is larger than the constant factor in the &lt;script type=&quot;math/tex&quot;&gt;O(n^{3})&lt;/script&gt; SQUARE-MATRIX-MULTIPLY procedure.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;When the matrices are sparse, methods tailored for sparse matrices are faster.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Strassen’s algorithm is not quite as numerically stable as the regular approach. In other words, because of the limited precision of computer arithmetic on noninteger values, larger errors accumulate in Strassen’s algorithm than in SQUARE-MATRIX-MULTIPLY.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;The submatrices formed at the levels of recursion consume space.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
+&lt;blockquote&gt;
+  &lt;ol&gt;
+    &lt;li&gt;
+      &lt;p&gt;The constant factor hidden in the &lt;script type=&quot;math/tex&quot;&gt;O(n^{log_2 7})&lt;/script&gt; running time of Strassen’s algorithm is larger than the constant factor in the &amp;gt; &lt;script type=&quot;math/tex&quot;&gt;O(n^{3})&lt;/script&gt; SQUARE-MATRIX-MULTIPLY procedure.&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;p&gt;When the matrices are sparse, methods tailored for sparse matrices are faster.&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;p&gt;Strassen’s algorithm is not quite as numerically stable as the regular approach. In other words, because of the limited precision of computer arithmetic on noninteger values, larger errors accumulate in Strassen’s algorithm than in SQUARE-MATRIX-MULTIPLY.&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;p&gt;The submatrices formed at the levels of recursion consume space.&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/blockquote&gt;
 
 &lt;p&gt;Cormen et al describe how the latter two reasons were mitigated around 1990. They state that the difference in numerical stability was overemphasized and although Strassen’s algorithm is too numerically unstable for some applications, it is within acceptable limits for others. In practice, fast matrix-multiplication implementations for dense matrices use Strassen’s algorithm for matrix sizes above a &lt;em&gt;crossover point&lt;/em&gt; and they switch to a simpler method once the subproblem size reduces to below the crossover point. The exact value of the crossover point is highly system dependent. Crossover points on various systems were found to range from 400 to 2150.&lt;/p&gt;
 
