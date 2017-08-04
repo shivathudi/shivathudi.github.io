@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Interactive visualizations using D3.js and D3 wrappers in Shiny</title>
-  <meta name="description" content="I think D3.js is the one of the best libraries out there for interactive visualizations. This post will cover two cases; the first one uses D3.js while the s...">
+  <title>Predicting Life Expectancy using Decision Tree Ensembles</title>
+  <meta name="description" content="">
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/jekyll/update/2017/04/30/int-vis-d3-flights.html">
+  <link rel="canonical" href="http://localhost:4000/jekyll/update/2017/04/12/life_exp.html">
   <link rel="alternate" type="application/rss+xml" title="Shiva Thudi" href="/feed.xml">
   
   
@@ -67,63 +67,36 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">Interactive visualizations using D3.js and D3 wrappers in Shiny</h1>
+    <h1 class="post-title" itemprop="name headline">Predicting Life Expectancy using Decision Tree Ensembles</h1>
     <p class="post-meta">
-      <time datetime="2017-04-30T20:43:02-07:00" itemprop="datePublished">
+      <time datetime="2017-04-12T10:00:00-07:00" itemprop="datePublished">
         
-        Apr 30, 2017
+        Apr 12, 2017
       </time>
       </p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>I think D3.js is the one of the best libraries out there for interactive visualizations. This post will cover two cases; the first one uses D3.js while the second one uses D3 wrappers in Shiny.</p>
+    <script type="text/javascript" async="" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 
-<h3 id="domestic-flights-by-city-in-the-us">Domestic Flights by City in the US</h3>
+<p>In this post, I will predict life expectancy for the “average” person born in a certain year in one or more countries. I gathered all my data from Gapminder. For the predictor variables, I used birth rates, mortality rates (male, female, under5, and infant), HIV rates, GNI, and Internet usage rates. You can find this data in a compiled csv format (feature_set.csv) <a href="https://github.com/shivathudi/machine-learning/blob/master/decision_trees/feature_set.csv">here</a>.</p>
 
-<p>The interactive plot is located here – <a href="https://shivathudi.github.io/flights-chord/">Chord Diagram</a>.</p>
+<p>There were some missing values of life expectancy in a few of the countries in the earlier years. I imputed these values using linear interpolation. I explored spline interpolation as well, but it did not improve the model’s performance in comparison with linear interpolation.</p>
 
-<p>The mouseover interactions can only be seen at the link above. The following screenshots only show some examples of static content and do not do justice to the actual figure.</p>
+<p>I considered linear regression, decision trees, random forests, gradient boosting machines, and extra-trees regressors. I also built a validation set for predicting life expectancy for years outside the ranges of the training data provided, specifically for the years 1960 and 2011 to 2015.</p>
 
-<p><img src="http://localhost:4000/assets/chord1.png" alt="Chord1" /></p>
+<p>The training MSE and validation set MSE are below:</p>
 
-<p><img src="http://localhost:4000/assets/chord2.png" alt="Chord2" /></p>
+<p><img src="http://localhost:4000/assets/lifeexp_trees.png" alt="illust1" height="150px" /></p>
 
-<p>The code for the chord diagram and the flights data can be found <a href="https://shivathudi.github.io/flights-chord/">here</a>.</p>
+<p>The extra trees regressor performed better than random forests and gradient boosting machines, and the optimal number of trees for this algorithm was 40. As expected, a single decision tree overfits the training data and performs quite poorly on the validation set.</p>
 
-<h3 id="diabetes-visualizations-in-shiny-using-d3-wrappers">Diabetes visualizations in Shiny using D3 wrappers</h3>
+<p>Additional features that I would have liked to include were the total expenditure on health per capita, and pollution estimates. I was unable to acquire accurate estimates for these features, and data was mostly unavailable for the years we considered. However, I believe these features would help predict life expectancy more accurately.</p>
 
-<p>Three different visualizations on a diabetes data set are located here – <a href="https://shivathudi.shinyapps.io/diabetes-vis2/">Diabetes Visualizations</a></p>
+<h3 id="code">Code</h3>
 
-<p>Again, to explore the full interactivity of these plots, I recommend that you visit the above link. The following examples are screenshots of static content.</p>
-
-<h3 id="parallel-co-ordinates-plot-with-brushing">Parallel Co-ordinates Plot with Brushing</h3>
-
-<p><img src="http://localhost:4000/assets/diab1.png" alt="diab1" /></p>
-
-<p>Here, you can select certain ranges of variables using brushing:</p>
-
-<p><img src="http://localhost:4000/assets/diab1.png" alt="diab2" /></p>
-
-<p>Scatterplot Matrix colored by different factors</p>
-
-<p>Here, there are three different factor variables that can be used to color the points – race, gender, and age.</p>
-
-<p><img src="http://localhost:4000/assets/diab3.png" alt="diab3" /></p>
-
-<p>You can select certain points in one square using brushing, and the same points are selected in the other squares:</p>
-
-<p><img src="http://localhost:4000/assets/diab4.png" alt="diab4" /></p>
-
-<h3 id="heatmaps-with-different-groupings">Heatmaps with different groupings</h3>
-
-<p>For these heatmaps, a user can select groupings to visualize measures such as the time in the hospital, and the number of lab procedures performed on diabetes patients.</p>
-
-<p><img src="http://localhost:4000/assets/diab5.png" alt="diab5" /></p>
-
-<p>The user can mouse over a particular cell to see the average value for that particular column or measure across the row or grouping.</p>
-
-<p>The code for all of the diabetes data visualizations can be found <a href="https://github.com/shivathudi/data-visualization/tree/master/diabetes_data">here</a>.</p>
+<p>You can find my code <a href="https://github.com/shivathudi/machine-learning/tree/master/decision_trees">here</a>.</p>
 
 
   </div>

@@ -16,7 +16,7 @@
 title: Shiva Thudi
 email: shivathudi@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  Hi! I’m Shiva Thudi, and this is my blog about the machine learning and data visualization projects I have done.
+  
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  shivathudi

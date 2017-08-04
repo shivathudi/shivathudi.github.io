@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Gradient Boosted Trees</title>
+  <meta name="description" content="">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/jekyll/update/2017/08/03/gbt-writeup.html">
+  <link rel="alternate" type="application/rss+xml" title="Shiva Thudi" href="/feed.xml">
+  
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+    <a class="site-title" href="/">Shiva Thudi</a>
+  
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+            <a class="page-link" href="/about/">About</a>
+            
+          
+            
+            
+          
+            
+            
+          
+            
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Gradient Boosted Trees</h1>
+    <p class="post-meta">
+      <time datetime="2017-08-03T10:00:00-07:00" itemprop="datePublished">
+        
+        Aug 3, 2017
+      </time>
+      </p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <script type="text/javascript" async="" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<p>In this post I will explore how Gradient Boosted Trees work. Gradient Boosting is a very popular and widely used (“<em>off-the-shelf</em>”) machine learning algorithm that often surpasses other algorithms in terms of predictive power. In almost every project and data challenge I have done at work and school, I have ended up using gradient boosting as my final model.</p>
+
+<p>First I will start by explaining what boosting is and how it came into practice. I will then explore how gradient boosted trees work. I will use pseudocode along the way, and I will be referencing illustrations and notes from <a href="http://web.stanford.edu/~hastie/ElemStatLearn/">The Elements of Statistical Learning</a> (ESL) by Friedman, Tibshirani, and Hastie. Initially, I will talk about boosting and loss functions from a binary classification perspective, but it can be extended to multi-class classification and regression problems as well.</p>
+
+<h2 id="boosting---introduction-and-adaboost">Boosting - Introduction and AdaBoost</h2>
+
+<p>Boosting is a procedure that combines the outputs of many weak classifiers (usually decision trees) to produce a powerful “committee”. It is similar to other committee-based approaches like bagging. In bagging, we take an average of the predictions made by building models on bootstrapped (sampling with replacement) datasets. Since each model is trained on a different bootstrapped dataset, this approach can be parallelized.</p>
+
+<p>Boosting, however, is a committee-based, sequential process that can’t be parallelized and which doesn’t use bootstrapping. AdaBoost.M1, a popular boosting algorithm due to Freund and Schapire (1997), works by training models on successive versions of the original data where observations that were misclassified by the previous model in the sequence are given higher weights than those that were correctly classified. Each model/tree in the sequence tries to correct for the errors made by the previous model. After a chosen number of modeling iterations, the final prediction is a weighted majority vote where each classifier is weighted according to its accuracy on the data it was trained on.</p>
+
+<h3 id="adaboost-algorithm-from-esl-friedman-et-al">AdaBoost algorithm from ESL, Friedman et al:</h3>
+
+<p>We assume that the output variable is coded as Y ∈ {−1, 1}. This is the AdaBoost algorithm:</p>
+
+<p><img src="http://localhost:4000/assets/AdaBoost.M1.png" alt="illust1" height="300px" /></p>
+
+<p>In practice, the classifiers or weak learners used in AdaBoost are <strong>stumps</strong>, which are decision trees with a single split.</p>
+
+<p>In ESL, Friedman et al. show how AdaBoost.M1 is equivalent to forward-stagewise additive modeling using the exponential loss function.</p>
+
+<p><strong>Minimizing loss of additive model</strong></p>
+
+<p><img src="http://localhost:4000/assets/additive.png" alt="illust2" height="75px" /></p>
+
+<p><strong>Exponential loss</strong></p>
+
+<script type="math/tex; mode=display">L(y, f (x)) = e^{(−y f (x))}</script>
+
+<p>They also state why a stagewise rather than a stepwise approach is used:</p>
+
+<blockquote>
+  <p>For many loss functions <script type="math/tex">L(y,f(x))</script> and/or basis functions <script type="math/tex">b(x;γ)</script>, this approach (stepwise) requires computationally intensive numerical optimization techniques. However, a simple alternative often can be found when it is feasible to rapidly solve the subproblem of fitting just a single basis function. Forward stagewise modeling approximates the solution by sequentially adding new basis functions to the expansion without adjusting the parameters and coefficients of those that have already been added.</p>
+</blockquote>
+
+<p>Hence, we can think of boosting as a numerical optimization problem where we have to minimize the loss using stagewise procedures. One weak learner is added at a time, without changing the previously computed parameters and coefficients of earlier models in the sequence.</p>
+
+<h2 id="gradient-boosted-trees">Gradient Boosted Trees</h2>
+
+<p>Gradient Boosted Trees are an ensemble of decision trees that are built in a stagewise fashion, allowing optimization of <strong>any differentiable loss function</strong>. In fact, for binary classification problems using the exponential loss function, Gradient Boosting is equivalent to AdaBoost.</p>
+
+<p>When a tree is added one at a time in the stagewise approach, we use a gradient descent procedure to minimize the loss. We do this by parametrizing the trees and moving in the direction indicated by gradient descent, reducing the residual loss at that step. This approach is referred to as functional gradient descent.</p>
+
+<h3 id="tree-parameters-and-approach">Tree parameters and approach</h3>
+
+<p>Decision trees work by partitioning the feature space into disjoint regions <script type="math/tex">R_{j} , j . . . J</script>. For x in particular region <script type="math/tex">R_j</script> the value of T(x) is constant. A tree can be formally expressed as:</p>
+
+<script type="math/tex; mode=display">T(x,\gamma) =  \sum_{j=1}^{J} \beta_{j} I(x ∈ R_j)</script>
+
+<p>where <script type="math/tex">I(x ∈ R_j)</script> is an indicator variable that takes the value of 1 if x belongs to region <script type="math/tex">R_j</script>, or 0 otherwise.</p>
+
+<p>The boosted tree model is a sum of M trees</p>
+
+<script type="math/tex; mode=display">f_{M} (x) = \sum_{m=1}^{M} T(x,\gamma_{m})</script>
+
+<p>induced in a forward stagewise manner. At each step <script type="math/tex">m</script>, we first find the regions <script type="math/tex">\{ R_{jm} \}_{m=1}^J</script> by solving</p>
+
+<script type="math/tex; mode=display">\gamma_m = arg min_\gamma \sum_{i=1}^{N} L(y_i,f_{m−1}(x_i)+ T(x_i,\gamma))</script>
+
+<p>Given the regions <script type="math/tex">R_{jm}</script>,  finding the optimal constants for each region can be done by</p>
+
+<script type="math/tex; mode=display">β_{jm} = arg min_\beta \sum_{x_{i} ∈ R_{jm}}^{} L(y_i, f_{m−1}(x_i) + β))</script>
+
+<h3 id="gradient-boosted-trees-for-regression-with-squared-loss">Gradient Boosted Trees for Regression with Squared Loss</h3>
+
+<p>To make the problem more clear, let’s consider the case of the squared loss for regression.</p>
+
+<p><img src="http://localhost:4000/assets/gbt_regr.png" alt="illust3" height="175px" /></p>
+
+<p>where <script type="math/tex">r_{im} = y_{i} − f_{m−1} (x_i)</script> is the residual for observation <script type="math/tex">i</script> at iteration <script type="math/tex">m</script>. This problem is a standard regression tree problem that can be solved using CART or any other regression tree method.</p>
+
+<script type="math/tex; mode=display">β_{jm} = arg min_\beta \sum_{x_{i} ∈ R_{jm}}^{} L(y_i, f_{m−1}(x_i) + β)</script>
+
+<script type="math/tex; mode=display">= arg min_\beta \sum_{x_{i} ∈ R_{jm}}^{} (r_{im}-β)^2</script>
+
+<p>This last problem has an analytical solution where <script type="math/tex">β</script> is the average of <script type="math/tex">r_{im}</script> over <script type="math/tex">R_{jm}</script>.</p>
+
+<h3 id="algorithm-and-other-loss-functions-illustrations-taken-from-esl">Algorithm and other loss functions (illustrations taken from ESL)</h3>
+
+<p>We have seen how gradient boosted trees work for regression using a squared loss. We can also use different loss criteria; the following illustration outlines the generic gradient tree-boosting algorithm for regression:</p>
+
+<p><img src="http://localhost:4000/assets/gbt-alg.png" alt="illust4" height="420px" /></p>
+
+<p>Specific algorithms are obtained by inserting different loss criteria <script type="math/tex">L(y,f(x))</script>.  Gradients for commonly used loss functions are shown below:</p>
+
+<p><img src="http://localhost:4000/assets/gbt-loss.png" alt="illust4" height="200px" /></p>
+
+<h4 id="tree-constraints-and-regularization">Tree constraints and regularization</h4>
+
+<p>There are certain tree constraints that we can choose to tune:</p>
+
+<ul>
+  <li>Number of trees, M - The main tuning parameter, it is often picked by monitoring the performance on a separate validation set, and then stopping once performance starts to decrease.</li>
+  <li>Tree depth - Deeper trees capture more interactions and complexities, usually a depth between 4 and 8 suffices.</li>
+  <li>Number of nodes</li>
+  <li>Minimum loss reduction</li>
+</ul>
+
+<p>We can also use L1 or L2 regularization terms to avoid overfitting.</p>
+
+
+  </div>
+
+  
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Shiva Thudi</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              Shiva Thudi
+            
+            </li>
+            
+            <li><a href="mailto:shivathudi@gmail.com" onClick="ga('send', 'event', 'outbound-link', 'click', 'email_link', {'dimension1': 'personal_email', 'metric1': 1});" ><span class="icon icon--github">shivathudi@gmail.com</a></li>
+            
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/shivathudi" onClick="ga('send', 'event', 'outbound-link', 'click', 'github_link', {'dimension1': 'github', 'metric1': 1});" ><span class="icon icon--github"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">shivathudi</span></a>
+
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

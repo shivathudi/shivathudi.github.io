@@ -1,5 +1,104 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-02T19:29:35-07:00</updated><id>http://localhost:4000/</id><title type="html">Shiva Thudi</title><subtitle>Hi! I’m Shiva Thudi, and this is my blog about the machine learning and data visualization projects I have done.
-</subtitle><entry><title type="html">Matrix multiplication using the Divide and Conquer paradigm</title><link href="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html" rel="alternate" type="text/html" title="Matrix multiplication using the Divide and Conquer paradigm" /><published>2017-06-15T20:43:02-07:00</published><updated>2017-06-15T20:43:02-07:00</updated><id>http://localhost:4000/jekyll/update/2017/06/15/matr-mult</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html">&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-08-03T17:03:52-07:00</updated><id>http://localhost:4000/</id><title type="html">Shiva Thudi</title><subtitle></subtitle><entry><title type="html">Gradient Boosted Trees</title><link href="http://localhost:4000/jekyll/update/2017/08/03/gbt-writeup.html" rel="alternate" type="text/html" title="Gradient Boosted Trees" /><published>2017-08-03T10:00:00-07:00</published><updated>2017-08-03T10:00:00-07:00</updated><id>http://localhost:4000/jekyll/update/2017/08/03/gbt-writeup</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/08/03/gbt-writeup.html">&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML&quot;&gt;
+&lt;/script&gt;
+
+&lt;p&gt;In this post I will explore how Gradient Boosted Trees work. Gradient Boosting is a very popular and widely used (“&lt;em&gt;off-the-shelf&lt;/em&gt;”) machine learning algorithm that often surpasses other algorithms in terms of predictive power. In almost every project and data challenge I have done at work and school, I have ended up using gradient boosting as my final model.&lt;/p&gt;
+
+&lt;p&gt;First I will start by explaining what boosting is and how it came into practice. I will then explore how gradient boosted trees work. I will use pseudocode along the way, and I will be referencing illustrations and notes from &lt;a href=&quot;http://web.stanford.edu/~hastie/ElemStatLearn/&quot;&gt;The Elements of Statistical Learning&lt;/a&gt; (ESL) by Friedman, Tibshirani, and Hastie. Initially, I will talk about boosting and loss functions from a binary classification perspective, but it can be extended to multi-class classification and regression problems as well.&lt;/p&gt;
+
+&lt;h2 id=&quot;boosting---introduction-and-adaboost&quot;&gt;Boosting - Introduction and AdaBoost&lt;/h2&gt;
+
+&lt;p&gt;Boosting is a procedure that combines the outputs of many weak classifiers (usually decision trees) to produce a powerful “committee”. It is similar to other committee-based approaches like bagging. In bagging, we take an average of the predictions made by building models on bootstrapped (sampling with replacement) datasets. Since each model is trained on a different bootstrapped dataset, this approach can be parallelized.&lt;/p&gt;
+
+&lt;p&gt;Boosting, however, is a committee-based, sequential process that can’t be parallelized and which doesn’t use bootstrapping. AdaBoost.M1, a popular boosting algorithm due to Freund and Schapire (1997), works by training models on successive versions of the original data where observations that were misclassified by the previous model in the sequence are given higher weights than those that were correctly classified. Each model/tree in the sequence tries to correct for the errors made by the previous model. After a chosen number of modeling iterations, the final prediction is a weighted majority vote where each classifier is weighted according to its accuracy on the data it was trained on.&lt;/p&gt;
+
+&lt;h3 id=&quot;adaboost-algorithm-from-esl-friedman-et-al&quot;&gt;AdaBoost algorithm from ESL, Friedman et al:&lt;/h3&gt;
+
+&lt;p&gt;We assume that the output variable is coded as Y ∈ {−1, 1}. This is the AdaBoost algorithm:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/AdaBoost.M1.png&quot; alt=&quot;illust1&quot; height=&quot;300px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In practice, the classifiers or weak learners used in AdaBoost are &lt;strong&gt;stumps&lt;/strong&gt;, which are decision trees with a single split.&lt;/p&gt;
+
+&lt;p&gt;In ESL, Friedman et al. show how AdaBoost.M1 is equivalent to forward-stagewise additive modeling using the exponential loss function.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Minimizing loss of additive model&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/additive.png&quot; alt=&quot;illust2&quot; height=&quot;75px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Exponential loss&lt;/strong&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;L(y, f (x)) = e^{(−y f (x))}&lt;/script&gt;
+
+&lt;p&gt;They also state why a stagewise rather than a stepwise approach is used:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;For many loss functions &lt;script type=&quot;math/tex&quot;&gt;L(y,f(x))&lt;/script&gt; and/or basis functions &lt;script type=&quot;math/tex&quot;&gt;b(x;γ)&lt;/script&gt;, this approach (stepwise) requires computationally intensive numerical optimization techniques. However, a simple alternative often can be found when it is feasible to rapidly solve the subproblem of fitting just a single basis function. Forward stagewise modeling approximates the solution by sequentially adding new basis functions to the expansion without adjusting the parameters and coefficients of those that have already been added.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Hence, we can think of boosting as a numerical optimization problem where we have to minimize the loss using stagewise procedures. One weak learner is added at a time, without changing the previously computed parameters and coefficients of earlier models in the sequence.&lt;/p&gt;
+
+&lt;h2 id=&quot;gradient-boosted-trees&quot;&gt;Gradient Boosted Trees&lt;/h2&gt;
+
+&lt;p&gt;Gradient Boosted Trees are an ensemble of decision trees that are built in a stagewise fashion, allowing optimization of &lt;strong&gt;any differentiable loss function&lt;/strong&gt;. In fact, for binary classification problems using the exponential loss function, Gradient Boosting is equivalent to AdaBoost.&lt;/p&gt;
+
+&lt;p&gt;When a tree is added one at a time in the stagewise approach, we use a gradient descent procedure to minimize the loss. We do this by parametrizing the trees and moving in the direction indicated by gradient descent, reducing the residual loss at that step. This approach is referred to as functional gradient descent.&lt;/p&gt;
+
+&lt;h3 id=&quot;tree-parameters-and-approach&quot;&gt;Tree parameters and approach&lt;/h3&gt;
+
+&lt;p&gt;Decision trees work by partitioning the feature space into disjoint regions &lt;script type=&quot;math/tex&quot;&gt;R_{j} , j . . . J&lt;/script&gt;. For x in particular region &lt;script type=&quot;math/tex&quot;&gt;R_j&lt;/script&gt; the value of T(x) is constant. A tree can be formally expressed as:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;T(x,\gamma) =  \sum_{j=1}^{J} \beta_{j} I(x ∈ R_j)&lt;/script&gt;
+
+&lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;I(x ∈ R_j)&lt;/script&gt; is an indicator variable that takes the value of 1 if x belongs to region &lt;script type=&quot;math/tex&quot;&gt;R_j&lt;/script&gt;, or 0 otherwise.&lt;/p&gt;
+
+&lt;p&gt;The boosted tree model is a sum of M trees&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f_{M} (x) = \sum_{m=1}^{M} T(x,\gamma_{m})&lt;/script&gt;
+
+&lt;p&gt;induced in a forward stagewise manner. At each step &lt;script type=&quot;math/tex&quot;&gt;m&lt;/script&gt;, we first find the regions &lt;script type=&quot;math/tex&quot;&gt;\{ R_{jm} \}_{m=1}^J&lt;/script&gt; by solving&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\gamma_m = arg min_\gamma \sum_{i=1}^{N} L(y_i,f_{m−1}(x_i)+ T(x_i,\gamma))&lt;/script&gt;
+
+&lt;p&gt;Given the regions &lt;script type=&quot;math/tex&quot;&gt;R_{jm}&lt;/script&gt;,  finding the optimal constants for each region can be done by&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;β_{jm} = arg min_\beta \sum_{x_{i} ∈ R_{jm}}^{} L(y_i, f_{m−1}(x_i) + β))&lt;/script&gt;
+
+&lt;h3 id=&quot;gradient-boosted-trees-for-regression-with-squared-loss&quot;&gt;Gradient Boosted Trees for Regression with Squared Loss&lt;/h3&gt;
+
+&lt;p&gt;To make the problem more clear, let’s consider the case of the squared loss for regression.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/gbt_regr.png&quot; alt=&quot;illust3&quot; height=&quot;175px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;r_{im} = y_{i} − f_{m−1} (x_i)&lt;/script&gt; is the residual for observation &lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt; at iteration &lt;script type=&quot;math/tex&quot;&gt;m&lt;/script&gt;. This problem is a standard regression tree problem that can be solved using CART or any other regression tree method.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;β_{jm} = arg min_\beta \sum_{x_{i} ∈ R_{jm}}^{} L(y_i, f_{m−1}(x_i) + β)&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;= arg min_\beta \sum_{x_{i} ∈ R_{jm}}^{} (r_{im}-β)^2&lt;/script&gt;
+
+&lt;p&gt;This last problem has an analytical solution where &lt;script type=&quot;math/tex&quot;&gt;β&lt;/script&gt; is the average of &lt;script type=&quot;math/tex&quot;&gt;r_{im}&lt;/script&gt; over &lt;script type=&quot;math/tex&quot;&gt;R_{jm}&lt;/script&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;algorithm-and-other-loss-functions-illustrations-taken-from-esl&quot;&gt;Algorithm and other loss functions (illustrations taken from ESL)&lt;/h3&gt;
+
+&lt;p&gt;We have seen how gradient boosted trees work for regression using a squared loss. We can also use different loss criteria; the following illustration outlines the generic gradient tree-boosting algorithm for regression:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/gbt-alg.png&quot; alt=&quot;illust4&quot; height=&quot;420px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Specific algorithms are obtained by inserting different loss criteria &lt;script type=&quot;math/tex&quot;&gt;L(y,f(x))&lt;/script&gt;.  Gradients for commonly used loss functions are shown below:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/gbt-loss.png&quot; alt=&quot;illust4&quot; height=&quot;200px&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;tree-constraints-and-regularization&quot;&gt;Tree constraints and regularization&lt;/h4&gt;
+
+&lt;p&gt;There are certain tree constraints that we can choose to tune:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Number of trees, M - The main tuning parameter, it is often picked by monitoring the performance on a separate validation set, and then stopping once performance starts to decrease.&lt;/li&gt;
+  &lt;li&gt;Tree depth - Deeper trees capture more interactions and complexities, usually a depth between 4 and 8 suffices.&lt;/li&gt;
+  &lt;li&gt;Number of nodes&lt;/li&gt;
+  &lt;li&gt;Minimum loss reduction&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We can also use L1 or L2 regularization terms to avoid overfitting.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Matrix multiplication using the Divide and Conquer paradigm</title><link href="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html" rel="alternate" type="text/html" title="Matrix multiplication using the Divide and Conquer paradigm" /><published>2017-06-15T20:43:02-07:00</published><updated>2017-06-15T20:43:02-07:00</updated><id>http://localhost:4000/jekyll/update/2017/06/15/matr-mult</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/06/15/matr-mult.html">&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML&quot;&gt;
 &lt;/script&gt;
 
 &lt;p&gt;In this post I will explore how the divide and conquer algorithm approach is applied to matrix multiplication. I will start with a brief introduction about how matrix multiplication is generally observed and implemented, apply different algorithms (such as Naive and Strassen) that are used in practice with both pseduocode and Python code, and then end with an analysis of their runtime complexities. There will be illustrations along the way, which are taken from Cormen’s textbook &lt;em&gt;Introduction to Algorithms&lt;/em&gt; and Tim Roughgarden’s slides from his &lt;em&gt;Algorithms specialization on Coursera&lt;/em&gt;.&lt;/p&gt;
@@ -223,4 +322,23 @@ return C
 
 &lt;p&gt;The user can mouse over a particular cell to see the average value for that particular column or measure across the row or grouping.&lt;/p&gt;
 
-&lt;p&gt;The code for all of the diabetes data visualizations can be found &lt;a href=&quot;https://github.com/shivathudi/data-visualization/tree/master/diabetes_data&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">I think D3.js is the one of the best libraries out there for interactive visualizations. This post will cover two cases; the first one uses D3.js while the second one uses D3 wrappers in Shiny.</summary></entry></feed>
+&lt;p&gt;The code for all of the diabetes data visualizations can be found &lt;a href=&quot;https://github.com/shivathudi/data-visualization/tree/master/diabetes_data&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">I think D3.js is the one of the best libraries out there for interactive visualizations. This post will cover two cases; the first one uses D3.js while the second one uses D3 wrappers in Shiny.</summary></entry><entry><title type="html">Predicting Life Expectancy using Decision Tree Ensembles</title><link href="http://localhost:4000/jekyll/update/2017/04/12/life_exp.html" rel="alternate" type="text/html" title="Predicting Life Expectancy using Decision Tree Ensembles" /><published>2017-04-12T10:00:00-07:00</published><updated>2017-04-12T10:00:00-07:00</updated><id>http://localhost:4000/jekyll/update/2017/04/12/life_exp</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/04/12/life_exp.html">&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML&quot;&gt;
+&lt;/script&gt;
+
+&lt;p&gt;In this post, I will predict life expectancy for the “average” person born in a certain year in one or more countries. I gathered all my data from Gapminder. For the predictor variables, I used birth rates, mortality rates (male, female, under5, and infant), HIV rates, GNI, and Internet usage rates. You can find this data in a compiled csv format (feature_set.csv) &lt;a href=&quot;https://github.com/shivathudi/machine-learning/blob/master/decision_trees/feature_set.csv&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;There were some missing values of life expectancy in a few of the countries in the earlier years. I imputed these values using linear interpolation. I explored spline interpolation as well, but it did not improve the model’s performance in comparison with linear interpolation.&lt;/p&gt;
+
+&lt;p&gt;I considered linear regression, decision trees, random forests, gradient boosting machines, and extra-trees regressors. I also built a validation set for predicting life expectancy for years outside the ranges of the training data provided, specifically for the years 1960 and 2011 to 2015.&lt;/p&gt;
+
+&lt;p&gt;The training MSE and validation set MSE are below:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/lifeexp_trees.png&quot; alt=&quot;illust1&quot; height=&quot;150px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The extra trees regressor performed better than random forests and gradient boosting machines, and the optimal number of trees for this algorithm was 40. As expected, a single decision tree overfits the training data and performs quite poorly on the validation set.&lt;/p&gt;
+
+&lt;p&gt;Additional features that I would have liked to include were the total expenditure on health per capita, and pollution estimates. I was unable to acquire accurate estimates for these features, and data was mostly unavailable for the years we considered. However, I believe these features would help predict life expectancy more accurately.&lt;/p&gt;
+
+&lt;h3 id=&quot;code&quot;&gt;Code&lt;/h3&gt;
+
+&lt;p&gt;You can find my code &lt;a href=&quot;https://github.com/shivathudi/machine-learning/tree/master/decision_trees&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry></feed>
